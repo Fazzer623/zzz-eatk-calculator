@@ -25,7 +25,6 @@ def add_cd_roll(initial_atk, cr, cd, flat_atk_buff, combat_atk_buff, cd_roll_val
     return calculate_eatk(initial_atk, cr, new_cd, flat_atk_buff, combat_atk_buff)
 
 def optimize_substats(initial_atk, cr, cd, flat_atk_buff, combat_atk_buff, atk_roll_value, cr_roll_value=2.4, cd_roll_value=4.8, max_iterations=100):
-    """Optimize EATK by moving rolls among ATK%, CR, and CD so all add similar increments."""
     current_cr = cr
     current_cd = cd
     current_initial = initial_atk
@@ -47,27 +46,33 @@ def optimize_substats(initial_atk, cr, cd, flat_atk_buff, combat_atk_buff, atk_r
         if abs(increments[max_key] - increments[min_key]) < 1e-6:
             break
 
+        # Moves must respect lower bounds:
         if min_key == 'atk' and max_key == 'cr':
             current_initial -= atk_roll_value
-            current_cr += cr_roll_value
+            current_cr = min(current_cr + cr_roll_value, 100)
         elif min_key == 'atk' and max_key == 'cd':
             current_initial -= atk_roll_value
-            current_cd += cd_roll_value
+            current_cd = max(current_cd + cd_roll_value, 50)  # lower bound 50%
         elif min_key == 'cr' and max_key == 'atk':
-            current_initial += atk_roll_value
-            current_cr -= cr_roll_value
+            if current_cr - cr_roll_value >= 5:  # lower bound 5%
+                current_initial += atk_roll_value
+                current_cr -= cr_roll_value
         elif min_key == 'cr' and max_key == 'cd':
-            current_cr -= cr_roll_value
-            current_cd += cd_roll_value
+            if current_cr - cr_roll_value >= 5:
+                current_cr -= cr_roll_value
+                current_cd = max(current_cd + cd_roll_value, 50)
         elif min_key == 'cd' and max_key == 'atk':
-            current_initial += atk_roll_value
-            current_cd -= cd_roll_value
+            if current_cd - cd_roll_value >= 50:
+                current_initial += atk_roll_value
+                current_cd -= cd_roll_value
         elif min_key == 'cd' and max_key == 'cr':
-            current_cd -= cd_roll_value
-            current_cr += cr_roll_value
+            if current_cd - cd_roll_value >= 50:
+                current_cd -= cd_roll_value
+                current_cr = min(current_cr + cr_roll_value, 100)
 
-        current_cr = min(max(current_cr, 0), 100)
-        current_cd = max(current_cd, 0)
+        # Clamp CR and CD to boundaries after all moves:
+        current_cr = max(min(current_cr, 100), 5)
+        current_cd = max(current_cd, 50)
         current_initial = max(current_initial, 0)
 
     optimized = {
@@ -77,7 +82,6 @@ def optimize_substats(initial_atk, cr, cd, flat_atk_buff, combat_atk_buff, atk_r
         'EATK': calculate_eatk(current_initial, current_cr, current_cd, flat_atk_buff, combat_atk_buff)
     }
     return optimized
-
 # === Streamlit UI ===
 
 st.title("EATK Calculator & Optimizer")
