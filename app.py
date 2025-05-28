@@ -87,17 +87,17 @@ Enter your character stats below.
 Percentage values are in **% (0-100)** for easier input.
 """)
 
-initial_atk = st.number_input("Initial ATK", min_value=0.0, value=2900.0, step=1.0, format="%.1f")
+initial_atk = st.number_input("Initial ATK (Stat screen value)", min_value=0.0, value=2900.0, step=1.0, format="%.1f")
 
-cr = st.number_input("Critical Rate (CR %) (0 to 100)", min_value=0.0, max_value=100.0, value=80.0, step=0.1, format="%.2f")
+cr = st.number_input("Combat Critical Rate (CR %) (0 to 100)", min_value=0.0, max_value=100.0, value=80.0, step=0.1, format="%.2f")
 
-cd = st.number_input("Critical Damage (CD %) (e.g. 160 for 160%)", min_value=0.0, value=160.0, step=0.1, format="%.2f")
+cd = st.number_input("Combat Critical Damage (CD %) (e.g. 160 for 160%)", min_value=0.0, value=160.0, step=0.1, format="%.2f")
 
 flat_atk_buff = st.number_input("Flat ATK Buff (from external sources)", value=200.0, step=1.0, format="%.1f")
 
 combat_atk_buff = st.number_input("Combat ATK% Buff (as %, e.g. 25 for 25%)", min_value=0.0, value=25.0, step=0.1, format="%.2f")
 
-atk_roll_value = st.number_input("ATK% Substat Roll value (added to Initial ATK)", min_value=0.0, value=49.26, step=0.01, format="%.1f")
+atk_roll_value = st.number_input("ATK% Substat Roll value (added to Initial ATK)", min_value=0.0, value=49.26, step=0.01, format="%.2f")
 
 cr_roll_value = 2.4  # 2.4%
 cd_roll_value = 4.8  # 4.8%
